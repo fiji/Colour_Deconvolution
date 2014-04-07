@@ -24,6 +24,13 @@
 		</dependency>
 	</dependencies>
 
+	<scm>
+		<connection>scm:git:git://github.com/fiji/Colour_Deconvolution</connection>
+		<developerConnection>scm:git:git@github.com:fiji/Colour_Deconvolution</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/fiji/Colour_Deconvolution</url>
+	</scm>
+
 	<repositories>
 		<!-- NB: for project parent, in case of partial checkout -->
 		<repository>
