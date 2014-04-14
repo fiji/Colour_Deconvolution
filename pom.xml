@@ -24,6 +24,11 @@
 		</dependency>
 	</dependencies>
 
+	<ciManagement>
+		<system>Jenkins</system>
+		<url>http://jenkins.imagej.net/job/Colour_Deconvolution/</url>
+	</ciManagement>
+
 	<scm>
 		<connection>scm:git:git://github.com/fiji/Colour_Deconvolution</connection>
 		<developerConnection>scm:git:git@github.com:fiji/Colour_Deconvolution</developerConnection>
