@@ -1,4 +1,5 @@
 import ij.IJ;
+import ij.ImageJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
@@ -718,6 +719,24 @@ public class Colour_Deconvolution implements PlugIn {
 		xyzf[2]=imp.getCurrentSlice()-1;
 		xyzf[3]=ic.getModifiers();
 	}
+	
+	public static void main(String[] args) {
+    // set the plugins.dir property to make the plugin appear in the Plugins menu
+    Class<?> clazz = Colour_Deconvolution.class;
+    String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
+    String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
+    System.setProperty("plugins.dir", pluginsDir);
+
+    // start ImageJ
+    new ImageJ();
+
+    // open the Clown sample
+    ImagePlus image = IJ.openImage("http://imagej.net/images/clown.jpg");
+    image.show();
+
+    // run the plugin
+    IJ.runPlugIn(clazz.getName(), "");
+  }
 
 }
 
