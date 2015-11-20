@@ -11,6 +11,12 @@ import ij.plugin.PlugIn;
 import ij.process.ImageProcessor;
 
 import java.awt.Point;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class Colour_Deconvolution implements PlugIn {
 
@@ -91,10 +97,27 @@ public class Colour_Deconvolution implements PlugIn {
       IJ.error("RGB image needed.");
       return;
     }
+    
+    LinkedHashMap<String,StainMatrix> matrixHashList = null;
+    try
+    {
+      matrixHashList = getStainList();
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+      return;
+    }
+    if(matrixHashList == null)
+      return;    
+    ArrayList<String> matrixSet = new ArrayList<String>(matrixHashList.keySet());
+    matrixSet.add("From ROI");
+    matrixSet.add("User values");
+    String[] stainArray = matrixSet.toArray(new String[matrixSet.size()]);     
 
     GenericDialog gd = new GenericDialog("Colour Deconvolution 1.7", IJ.getInstance());
     gd.addMessage("Warning: This plugin is not suitable to quantify\n the intensity of immunostained slides because\n immunostains are not stoichiometric.");
-    gd.addChoice("Vectors", MatrixTransformation.STAIN_ARRAY, MatrixTransformation.STAIN_ARRAY[0]);
+    gd.addChoice("Vectors", stainArray, stainArray[0]);
     gd.addCheckbox("Show matrices",false);
     gd.addCheckbox("Hide legend",false);
 
@@ -104,43 +127,11 @@ public class Colour_Deconvolution implements PlugIn {
     String myStain = gd.getNextChoice();
     boolean doIshow = gd.getNextBoolean();
     boolean hideLegend = gd.getNextBoolean();
-    MatrixTransformation mt = null; 
+    StainMatrix mt = null; 
     
-    // stains are defined after this line
-    if (myStain.equals(MatrixTransformation.STAINING_H_E))
-      mt = new Matrix_HE();
-    else if (myStain.equals(MatrixTransformation.STAINING_H_E2))
-      mt = new Matrix_HE2();
-    else if(myStain.equals(MatrixTransformation.STAINING_H_DAB))
-      mt = new Matrix_H_DAB();
-    else if(myStain.equals(MatrixTransformation.STAINING_FEULGEN_LIGHT_GREEN))
-      mt = new Matrix_FeulgenLightGreen();
-    else if(myStain.equals(MatrixTransformation.STAINING_GIEMSA))
-      mt = new Matrix_Giemsa();
-    else if(myStain.equals(MatrixTransformation.STAINING_FAST_RED_FAST_BLUE_DAB))
-      mt = new Matrix_FastRedFastBlueDAB();
-    else if(myStain.equals(MatrixTransformation.STAINING_METHYL_GREEN_DAB))
-      mt = new Matrix_MethylGreen_DAB();
-    else if(myStain.equals(MatrixTransformation.STAINING_H_E_DAB))
-      mt = new Matrix_HE_DAB();
-    else if(myStain.equals(MatrixTransformation.STAINING_H_AEC))
-      mt = new Matrix_H_AEC();
-    else if(myStain.equals(MatrixTransformation.STAINING_AZAN_MALLORY))
-      mt = new Matrix_AzanMallory();
-    else if(myStain.equals(MatrixTransformation.STAINING_MASSON_TRICHROME))
-      mt = new Matrix_MassonTrichrome();
-    else if(myStain.equals(MatrixTransformation.STAINING_ALCIAN_BLUE_H))
-      mt = new Matrix_AlcianBlue_H();
-    else if(myStain.equals(MatrixTransformation.STAINING_H_PAS))
-      mt = new Matrix_H_PAS();
-    else if(myStain.equals(MatrixTransformation.STAINING_BRILLIANT_BLUE))
-      mt = new Matrix_BrilliantBlue();
-    else if(myStain.equals(MatrixTransformation.STAINING_RGB))
-      mt = new Matrix_RGB();
-    else if(myStain.equals(MatrixTransformation.STAINING_CMY))
-      mt = new Matrix_CMY();
-
-    if (myStain.equals(MatrixTransformation.STAINING_USER_VALUES)){
+    mt = matrixHashList.get(myStain);
+    
+    if (myStain.equals("User values")){
       GenericDialog gd2 = new GenericDialog("User values", IJ.getInstance());
       gd2.addMessage("Colour[1]");
       gd2.addNumericField("[R1]", 0, 5);
@@ -158,35 +149,37 @@ public class Colour_Deconvolution implements PlugIn {
       gd2.showDialog();
       if (gd2.wasCanceled())
         return;
-      mt = new Matrix_Custom();
-      mt.getMODx()[0]=gd2.getNextNumber();
-      mt.getMODy()[0]=gd2.getNextNumber();
-      mt.getMODz()[0]=gd2.getNextNumber();
-      mt.getMODx()[1]=gd2.getNextNumber();
-      mt.getMODy()[1]=gd2.getNextNumber();
-      mt.getMODz()[1]=gd2.getNextNumber();
-      mt.getMODx()[2]=gd2.getNextNumber();
-      mt.getMODy()[2]=gd2.getNextNumber();
-      mt.getMODz()[2]=gd2.getNextNumber();
+      mt = new StainMatrix();
+      double x0=gd2.getNextNumber();
+      double y0=gd2.getNextNumber();
+      double z0=gd2.getNextNumber();
+      double x1=gd2.getNextNumber();
+      double y1=gd2.getNextNumber();
+      double z1=gd2.getNextNumber();
+      double x2=gd2.getNextNumber();
+      double y2=gd2.getNextNumber();
+      double z2=gd2.getNextNumber();
+      mt.init("User values", x0, y0, z0,x1, y1, z1,x2, y2, z2);
     }
 
     if (myStain.equals("From ROI")){
-      mt = new Matrix_Custom();
+      mt = new StainMatrix();
       IJ.runMacro("setOption('DisablePopupMenu', true)");
+      double[] matrixValue=new double[9];
       double [] rgbOD = new double[3];
       for (int i=0; i<3; i++){
         getmeanRGBODfromROI(i, rgbOD, imp);
-        mt.getMODx()[i]=rgbOD[0];
-        mt.getMODy()[i]=rgbOD[1];
-        mt.getMODz()[i]=rgbOD[2];
+        matrixValue[3*i+0]=rgbOD[0];
+        matrixValue[3*i+1]=rgbOD[1];
+        matrixValue[3*i+2]=rgbOD[2];
       }
-
+      mt.init("From ROI", matrixValue[0], matrixValue[1], matrixValue[2],
+                          matrixValue[3], matrixValue[4], matrixValue[5],
+                          matrixValue[6], matrixValue[7], matrixValue[8]);
       IJ.runMacro("setOption('DisablePopupMenu', false)");
-
     }
     
     mt.computeAndShow(doIshow, hideLegend, imp);
-
   }
   
 
@@ -284,6 +277,36 @@ public class Colour_Deconvolution implements PlugIn {
 
     // Run the plugin
     IJ.runPlugIn(clazz.getName(), "");
+  }
+  
+  private LinkedHashMap<String,StainMatrix> getStainList() throws IOException
+  {
+    //ArrayList<StainMatrix> matrixList= new ArrayList<StainMatrix>();
+    LinkedHashMap<String,StainMatrix> matrixMap = new LinkedHashMap<String,StainMatrix>();
+    
+    
+    String libDir =IJ.getDirectory("plugins");
+    File file = new File(libDir,"colourdeconvolution.txt");
+    ArrayList<String> lines= new ArrayList<String>();
+    if (file.exists()) {
+      BufferedReader reader = new BufferedReader(new FileReader(file));
+      String line = reader.readLine();
+      while (line != null) {
+        lines.add(line);
+        line = reader.readLine();
+      }
+      reader.close();
+    }
+    
+    for(int i=1;i<lines.size();i++)
+    {
+      StainMatrix matrix = new StainMatrix();
+      matrix.init(lines.get(i));
+      //matrixList.add(matrix);
+      matrixMap.put(matrix.myStain, matrix);
+    }
+    
+    return matrixMap;
   }
 
 }

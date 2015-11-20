@@ -1,36 +1,25 @@
 package colourdeconvolution;
+
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.image.IndexColorModel;
+import java.util.regex.Pattern;
 
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.gui.NewImage;
+import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.process.ImageProcessor;
 
 /**
- * This abstract class contains all the library methods to perform image deconvolution based on some pre-stain or custom vector.
- * E.gg, to perfom an H&E DAB deconvolution, do the following:
+ * This abstract class contains all the library methods to perform image deconvolution based on custom vector.
  * <code>
- * boolean showMatrix=false; //To not display the Matrix used to do the deconvolution in a popup at the end of the process
+ * boolean showMatrix=false;//To not display the Matrix used to do the deconvolution in a popup at the end of the process
  * boolean hideLegend=true; //To not display the deconvolution legend in a popup at the end of the process
- * ImagePlus imp = WindowManager.getCurrentImage();
- * MatrixTransformation mt = new Matrix_HE_DAB(); // Create a new MatrixTransformation corresponding to your stain.
- * //Compute the Deconvolution images and return a Stack array of three 8-bit images.
- * ImageStack[] stacks = mt.compute(showMatrix, hideLegend, imp);
- * Then if you want to display them:
- * new ImagePlus(title+"-(Colour_1)",stack[0]).show();
- * new ImagePlus(title+"-(Colour_2)",stack[1]).show();
- * new ImagePlus(title+"-(Colour_3)",stack[2]).show();
- * </code>
- * 
- * If you want to use your own Matrix :
- * <code>
- * boolean showMatrix=false; //To not display the Matrix used to do the deconvolution in a popup at the end of the process
- * boolean hideLegend=true; //To not display the deconvolution legend in a popup at the end of the process
- * mt = new Matrix_Custom();// Create a new Matrix_Custom
+ * mt = new StainMatrix();  // Create a new Matrix_Custom
  * //Populate the Transformation Matrix
  * mt.getMODx()[0]=0.650;
  * mt.getMODy()[0]=0.704;
@@ -63,40 +52,61 @@ import ij.process.ImageProcessor;
  * @author Benjamin Pavie
  *
  */
-public abstract class MatrixTransformation {
 
-  public static final String [] STAIN_ARRAY={"From ROI", "H&E", "H&E 2","H DAB", "Feulgen Light Green", "Giemsa", "FastRed FastBlue DAB", "Methyl Green DAB",
-    "H&E DAB", "H AEC","Azan-Mallory","Masson Trichrome","Alcian blue & H","H PAS","Brilliant_Blue","RGB","CMY", "User values"};
-  public static String STAINING_FROM_ROI               = STAIN_ARRAY[0];
-  public static String STAINING_H_E                    = STAIN_ARRAY[1];
-  public static String STAINING_H_E2                   = STAIN_ARRAY[2];
-  public static String STAINING_H_DAB                  = STAIN_ARRAY[3];
-  public static String STAINING_FEULGEN_LIGHT_GREEN    = STAIN_ARRAY[4];
-  public static String STAINING_GIEMSA                 = STAIN_ARRAY[5];
-  public static String STAINING_FAST_RED_FAST_BLUE_DAB = STAIN_ARRAY[6];
-  public static String STAINING_METHYL_GREEN_DAB       = STAIN_ARRAY[7];
-  public static String STAINING_H_E_DAB                = STAIN_ARRAY[8];
-  public static String STAINING_H_AEC                  = STAIN_ARRAY[9];
-  public static String STAINING_AZAN_MALLORY           = STAIN_ARRAY[10];
-  public static String STAINING_MASSON_TRICHROME       = STAIN_ARRAY[11];
-  public static String STAINING_ALCIAN_BLUE_H          = STAIN_ARRAY[12];
-  public static String STAINING_H_PAS                  = STAIN_ARRAY[13];
-  public static String STAINING_BRILLIANT_BLUE         = STAIN_ARRAY[14];
-  public static String STAINING_RGB                    = STAIN_ARRAY[15];
-  public static String STAINING_CMY                    = STAIN_ARRAY[16];
-  public static String STAINING_USER_VALUES            = STAIN_ARRAY[17];
-  
+public class StainMatrix {
   double[] MODx, MODy, MODz;
   String myStain;
   private double [] cosx = new double[3];
   private double [] cosy = new double[3];
   private double [] cosz = new double[3];
 
-  public void init()
+  public StainMatrix()
   {
     MODx=new double[3];
     MODy=new double[3];
     MODz=new double[3];
+  }
+  
+  public void init(String line)
+  {
+    String[] parts = line.split(Pattern.quote(","));
+    
+    for(int i=0;i<parts.length;i++)
+      System.out.println(parts[i].replaceAll("\\s+$", ""));
+    
+    if(parts.length!=10)
+      return;
+    else
+    {
+      
+      myStain=parts[0].replaceAll("\\s+$", "");
+      MODx[0]=Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
+      MODy[0]=Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
+      MODz[0]=Double.parseDouble(parts[3].replaceAll("\\s+$", ""));
+      MODx[1]=Double.parseDouble(parts[4].replaceAll("\\s+$", ""));
+      MODy[1]=Double.parseDouble(parts[5].replaceAll("\\s+$", ""));
+      MODz[1]=Double.parseDouble(parts[6].replaceAll("\\s+$", ""));
+      MODx[2]=Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
+      MODy[2]=Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
+      MODz[2]=Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
+      
+    }
+  }
+  
+  public void init(String stainName, double x0, double y0, double z0, 
+                                     double x1, double y1, double z1,
+                                     double x2, double y2, double z2)
+  {
+    myStain=stainName;
+    MODx[0]=x0;
+    MODy[0]=y0;
+    MODz[0]=z0;
+    MODx[1]=x1;
+    MODy[1]=y1;
+    MODz[1]=z1;
+    MODx[2]=x2;
+    MODy[2]=y2;
+    MODz[2]=z2;
   }
   
   public double[] getMODx() {
@@ -359,6 +369,49 @@ public abstract class MatrixTransformation {
         "\t\t\tMODz["+i+"]="+ (float) cosz[i] +";\n\n");
     }
     IJ.log("}");
+  }
+  
+  public void init(Roi[] rois, ImageProcessor ip, String stainName)
+  {
+    myStain=stainName;
+    int p;
+    double log255=Math.log(255.0);
+    double [] rgbOD = new double[3];
+    
+    rgbOD[0]=0;
+    rgbOD[1]=0;
+    rgbOD[2]=0;
+    
+    for (int c=0; c<3; c++)
+    {
+      Roi roi = rois[c];
+      if (roi instanceof PolygonRoi)
+      {
+        PolygonRoi polygon = (PolygonRoi)roi;
+        Rectangle bounds = roi.getBounds();
+        int w = roi.getBounds().width;
+        int h = roi.getBounds().height;
+        int n = polygon.getNCoordinates();
+        int[] x = polygon.getXCoordinates();
+        int[] y = polygon.getYCoordinates();
+
+        for (int i = 0; i < n; i++)
+        {
+          p=ip.getPixel(bounds.x + x[i],bounds.y + y[i]);
+          rgbOD[0] = rgbOD[0]+ (-((255.0*Math.log(((double)((p & 0xff0000)>>16) +1)/255.0))/log255));
+          rgbOD[1] = rgbOD[1]+ (-((255.0*Math.log(((double)((p & 0x00ff00)>> 8) +1)/255.0))/log255));
+          rgbOD[2] = rgbOD[2]+ (-((255.0*Math.log(((double)((p & 0x0000ff))     +1)/255.0))/log255));
+        }
+        rgbOD[0] = rgbOD[0] / (w*h);
+        rgbOD[1] = rgbOD[1] / (w*h);
+        rgbOD[2] = rgbOD[2] / (w*h);
+
+      
+        MODx[c]=rgbOD[0];
+        MODy[c]=rgbOD[1];
+        MODz[c]=rgbOD[2];
+      }
+    }
   }
   
 }
