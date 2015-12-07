@@ -1,4 +1,4 @@
-package colourdeconvolution;
+package sc.fiji.colourDeconvolution;
 
 import java.awt.Color;
 import java.awt.Font;

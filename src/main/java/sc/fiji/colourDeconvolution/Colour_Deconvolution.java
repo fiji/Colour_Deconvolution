@@ -1,4 +1,4 @@
-package colourdeconvolution;
+package sc.fiji.colourDeconvolution;
 
 import ij.IJ;
 import ij.ImageJ;
