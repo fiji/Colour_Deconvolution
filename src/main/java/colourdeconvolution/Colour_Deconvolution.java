@@ -13,8 +13,12 @@ import ij.process.ImageProcessor;
 import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -281,14 +285,55 @@ public class Colour_Deconvolution implements PlugIn {
   
   private LinkedHashMap<String,StainMatrix> getStainList() throws IOException
   {
-    //ArrayList<StainMatrix> matrixList= new ArrayList<StainMatrix>();
     LinkedHashMap<String,StainMatrix> matrixMap = new LinkedHashMap<String,StainMatrix>();
+    ArrayList<String> lines = new ArrayList<String>();
     
-    
+    //First, check if the colourdeconvolution.txt exist already
     String libDir =IJ.getDirectory("plugins");
     File file = new File(libDir,"colourdeconvolution.txt");
-    ArrayList<String> lines= new ArrayList<String>();
-    if (file.exists()) {
+    //If not create it
+    if (!file.exists()) {
+      try
+      {
+        InputStream stream = getClass().getResourceAsStream("colourdeconvolution.txt");
+        OutputStream outStream = new FileOutputStream(file);
+        byte[] buffer = new byte[8 * 1024];
+        int bytesRead;
+        while ((bytesRead = stream.read(buffer)) != -1)
+          outStream.write(buffer, 0, bytesRead);
+        stream.close();
+        outStream.close();
+      }
+      catch(IOException ioe)
+      {
+        System.out.println(ioe);
+        IJ.error("Plugin Directory not writable", "The Plugin directory is not writable, so the file containing the vector list would not be copied into the plugin directory."+
+                                                   System.getProperty("line.separator")+ioe);
+        if(file.exists())
+          file.delete();
+      }
+    }
+    
+    if (!file.exists())
+    {
+      //First, read the colourdeconvolution.txt included in the jar file
+      InputStream stream = getClass().getResourceAsStream("colourdeconvolution.txt");
+      BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+      String line = reader.readLine();
+      while (line != null) {
+        lines.add(line);
+        line = reader.readLine();
+      }
+      reader.close();    
+      for(int i=1;i<lines.size();i++)
+      {
+        StainMatrix matrix = new StainMatrix();
+        matrix.init(lines.get(i));
+        matrixMap.put(matrix.myStain, matrix);
+      }
+    }
+    else
+    {    
       BufferedReader reader = new BufferedReader(new FileReader(file));
       String line = reader.readLine();
       while (line != null) {
@@ -296,8 +341,26 @@ public class Colour_Deconvolution implements PlugIn {
         line = reader.readLine();
       }
       reader.close();
+      for(int i=1;i<lines.size();i++)
+      {
+        StainMatrix matrix = new StainMatrix();
+        matrix.init(lines.get(i));
+        matrixMap.put(matrix.myStain, matrix);
+      }
     }
     
+    /*
+    
+    //First, read the colourdeconvolution.txt included in the jar file
+    InputStream stream = getClass().getResourceAsStream("colourdeconvolution.txt");
+    ArrayList<String> lines= new ArrayList<String>();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+    String line = reader.readLine();
+    while (line != null) {
+      lines.add(line);
+      line = reader.readLine();
+    }
+    reader.close();    
     for(int i=1;i<lines.size();i++)
     {
       StainMatrix matrix = new StainMatrix();
@@ -306,8 +369,31 @@ public class Colour_Deconvolution implements PlugIn {
       matrixMap.put(matrix.myStain, matrix);
     }
     
+    
+    //Then read the one in the plugin directory, and add the vector by stain name. If the name was already present, it is overwritten.
+    String libDir =IJ.getDirectory("plugins");
+    File file = new File(libDir,"colourdeconvolution.txt");
+    lines= new ArrayList<String>();
+    if (file.exists()) {
+      reader = new BufferedReader(new FileReader(file));
+      line = reader.readLine();
+      while (line != null) {
+        lines.add(line);
+        line = reader.readLine();
+      }
+      reader.close();
+    }
+    for(int i=1;i<lines.size();i++)
+    {
+      StainMatrix matrix = new StainMatrix();
+      matrix.init(lines.get(i));
+      //matrixList.add(matrix);
+      matrixMap.put(matrix.myStain, matrix);
+    }
+    */
     return matrixMap;
   }
+  
 
 }
 
