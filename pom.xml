@@ -69,11 +69,6 @@
 			<name>Benjamin Pavie</name>
 			<properties><id>bpavie</id></properties>
 		</contributor>
-		<contributor>
-			<name>Jean-Yves Tinevez</name>
-			<url>http://imagej.net/User:JeanYvesTinevez</url>
-			<properties><id>tinevez</id></properties>
-		</contributor>
 	</contributors>
 
 	<scm>
