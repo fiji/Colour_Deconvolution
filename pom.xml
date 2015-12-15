@@ -24,6 +24,10 @@
 		<tag>HEAD</tag>
 		<url>https://github.com/fiji/Colour_Deconvolution</url>
 	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/fiji/Colour_Deconvolution/issues</url>
+	</issueManagement>
 	<ciManagement>
 		<system>Jenkins</system>
 		<url>http://jenkins.imagej.net/job/Colour_Deconvolution/</url>
@@ -44,5 +48,4 @@
 			<artifactId>ij</artifactId>
 		</dependency>
 	</dependencies>
-
 </project>
