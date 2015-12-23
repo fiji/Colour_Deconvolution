@@ -306,7 +306,6 @@ public class Colour_Deconvolution implements PlugIn {
       }
       catch(IOException ioe)
       {
-        System.out.println(ioe);
         IJ.error("Plugin Directory not writable", "The Plugin directory is not writable, so the file containing the vector list would not be copied into the plugin directory."+
                                                    System.getProperty("line.separator")+ioe);
         if(file.exists())

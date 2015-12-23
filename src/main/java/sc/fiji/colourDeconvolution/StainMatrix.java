@@ -70,15 +70,10 @@ public class StainMatrix {
   public void init(String line)
   {
     String[] parts = line.split(Pattern.quote(","));
-    
-    for(int i=0;i<parts.length;i++)
-      System.out.println(parts[i].replaceAll("\\s+$", ""));
-    
     if(parts.length!=10)
       return;
     else
     {
-      
       myStain=parts[0].replaceAll("\\s+$", "");
       MODx[0]=Double.parseDouble(parts[1].replaceAll("\\s+$", ""));
       MODy[0]=Double.parseDouble(parts[2].replaceAll("\\s+$", ""));
@@ -89,7 +84,6 @@ public class StainMatrix {
       MODx[2]=Double.parseDouble(parts[7].replaceAll("\\s+$", ""));
       MODy[2]=Double.parseDouble(parts[8].replaceAll("\\s+$", ""));
       MODz[2]=Double.parseDouble(parts[9].replaceAll("\\s+$", ""));
-      
     }
   }
   
