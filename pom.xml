@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>Colour_Deconvolution</artifactId>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.0.1</version>
 
 	<name>plugins/Colour_Deconvolution.jar</name>
 	<description />
@@ -74,7 +74,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/fiji/Colour_Deconvolution</connection>
 		<developerConnection>scm:git:git@github.com:fiji/Colour_Deconvolution</developerConnection>
-		<tag>HEAD</tag>
+		<tag>Colour_Deconvolution-3.0.1</tag>
 		<url>https://github.com/fiji/Colour_Deconvolution</url>
 	</scm>
 	<issueManagement>
