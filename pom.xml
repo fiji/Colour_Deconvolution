@@ -19,10 +19,7 @@
 		<developer>
 			<id>landinig</id>
 			<name>Gabriel Landini</name>
-			<email>G.Landini@bham.ac.uk</email>
-			<url>http://www.birmingham.ac.uk/staff/profiles/clinical-sciences/landini-gabriel.aspx</url>
-			<organization>University of Birmingham</organization>
-			<organizationUrl>http://www.birmingham.ac.uk/</organizationUrl>
+			<url>http://imagej.net/User:Landini</url>
 			<roles>
 				<role>founder</role>
 				<role>lead</role>
@@ -32,7 +29,6 @@
 				<role>support</role>
 				<role>maintainer</role>
 			</roles>
-			<timezone>0</timezone>
 		</developer>
 		<developer>
 			<id>ctrueden</id>
