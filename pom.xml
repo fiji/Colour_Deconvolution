@@ -88,8 +88,8 @@
 		<url>https://github.com/fiji/Colour_Deconvolution/issues</url>
 	</issueManagement>
 	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.imagej.net/job/Colour_Deconvolution/</url>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/fiji/Colour_Deconvolution</url>
 	</ciManagement>
 
 	<properties>
