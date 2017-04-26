@@ -144,9 +144,11 @@ public class StainMatrix {
   }
 
   /**
-   * Compute the Deconvolution images and return a Stack array of three 8-bit images.
-   * If the specimen is stained with a 2 colour scheme (such as H & E) the 3rd image
-   * represents the complimentary of the first two colours (i.e. green)
+   * Compute the Deconvolution images and return a Stack array of three 8-bit
+   * images. If the specimen is stained with a 2 colour scheme (such as H &amp;
+   * E) the 3rd image represents the complimentary of the first two colours
+   * (i.e. green).
+   *
    * @param doIshow: Show or not the matrix in a popup
    * @param hideLegend: Hide or not the legend in a popup
    * @param imp : The ImagePlus that will be deconvolved. RGB only.
