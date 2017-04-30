@@ -11,7 +11,7 @@
 
 	<groupId>sc.fiji</groupId>
 	<artifactId>Colour_Deconvolution</artifactId>
-	<version>3.0.2-SNAPSHOT</version>
+	<version>3.0.2</version>
 
 	<name>Colour Deconvolution</name>
 	<description>Colour Deconvolution plugin for Fiji.</description>
@@ -80,7 +80,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/fiji/Colour_Deconvolution</connection>
 		<developerConnection>scm:git:git@github.com:fiji/Colour_Deconvolution</developerConnection>
-		<tag>HEAD</tag>
+		<tag>Colour_Deconvolution-3.0.2</tag>
 		<url>https://github.com/fiji/Colour_Deconvolution</url>
 	</scm>
 	<issueManagement>
