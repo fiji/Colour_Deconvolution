@@ -265,12 +265,13 @@ public class Colour_Deconvolution implements PlugIn {
     xyzf[3]=ic.getModifiers();
   }
   
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     // Set the plugins.dir property to make the plugin appear in the Plugins menu
+    // see: https://stackoverflow.com/a/7060464/1207769
     Class<?> clazz = Colour_Deconvolution.class;
-    String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
-    String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
-    System.setProperty("plugins.dir", pluginsDir);
+    java.net.URL url = clazz.getProtectionDomain().getCodeSource().getLocation();
+    java.io.File file = new java.io.File(url.toURI());
+    System.setProperty("plugins.dir", file.getAbsolutePath());
 
     // Start ImageJ
     new ImageJ();
